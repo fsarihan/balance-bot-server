@@ -26,7 +26,7 @@ export class Database {
         return new Promise((resolve, reject) => {
             this.connection.query('INSERT INTO accounts SET ?', {
                 name: name,
-                exchange_id: exchangeID,
+                exchangeID: exchangeID,
                 apiKey: apiKey,
                 apiSecret: apiSecret,
                 pass: pass,
