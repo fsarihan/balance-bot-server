@@ -1,5 +1,5 @@
 {
-	"name": "dumper-bot-server",
+	"name": "balance-bot-server",
 	"version": "1.0.0",
 	"description": "test",
 	"main": "server.js",
@@ -14,7 +14,7 @@
 		"dotenv": "^9.0.2",
 		"events": "^3.3.0",
 		"express": "^4.17.1",
-		"kucoin-node-sdk": "^1.0.3",
+		"kucoin-node-sdk": "file:./kucoin-node-sdk",
 		"limiter": "^2.0.1",
 		"mysql": "^2.18.1",
 		"node-binance-api": "^0.12.5",
@@ -30,12 +30,12 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/fsarihan/dumper-bot-server.git"
+		"url": "git+https://github.com/fsarihan/balance-bot-server.git"
 	},
 	"author": "",
 	"license": "ISC",
 	"bugs": {
-		"url": "https://github.com/fsarihan/dumper-bot-server/issues"
+		"url": "https://github.com/fsarihan/balance-bot-server/issues"
 	},
-	"homepage": "https://github.com/fsarihan/dumper-bot-server#readme"
+	"homepage": "https://github.com/fsarihan/balance-bot-server#readme"
 }

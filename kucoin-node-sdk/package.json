@@ -1,0 +1,59 @@
+{
+  "_from": "kucoin-node-sdk",
+  "_id": "kucoin-node-sdk@1.0.3",
+  "_inBundle": false,
+  "_integrity": "sha512-M46CGka7XkHhZytG4gD2h3yxK5O7yFR5W+JpaEWzsmI8PNj5MhfbUmAevPY1nSBLkesL1H1kwaf4IokP5PmIJQ==",
+  "_location": "/kucoin-node-sdk",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "kucoin-node-sdk",
+    "name": "kucoin-node-sdk",
+    "escapedName": "kucoin-node-sdk",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/kucoin-node-sdk/-/kucoin-node-sdk-1.0.3.tgz",
+  "_shasum": "609c40736896b9cde82c49758d934114598dbec6",
+  "_spec": "kucoin-node-sdk",
+  "_where": "/home/furkan/Masaüstü/balance-bot/server",
+  "bugs": {
+    "url": "https://github.com/Kucoin/kucoin-node-sdk/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "dot-prop": "^4.2.1",
+    "event-emitter": "^0.3.5",
+    "lodash": "^4.17.15",
+    "log-update": "^4.0.0",
+    "md5": "^2.2.1",
+    "node-fetch": "^2.6.0",
+    "node-schedule": "^1.3.2",
+    "uuid": "^8.0.0",
+    "ws": "^7.3.1"
+  },
+  "deprecated": false,
+  "description": "KuCoin API SDK for Node.js language",
+  "devDependencies": {
+    "cross-env": "^7.0.2",
+    "nodemon": "^1.19.4"
+  },
+  "homepage": "https://github.com/Kucoin/kucoin-node-sdk#readme",
+  "license": "Apache-2.0",
+  "main": "src/index.js",
+  "name": "kucoin-node-sdk",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kucoin/kucoin-node-sdk.git"
+  },
+  "scripts": {
+    "dev": "cross-env PRODUCTION=dev nodemon demo/index.js"
+  },
+  "version": "1.0.3"
+}
