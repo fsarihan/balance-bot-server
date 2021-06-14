@@ -22,73 +22,14 @@ export class Database {
         return new Date();
     }
 
-    public insertLog(log: string): Promise<any> {
-        return new Promise((resolve, reject) => {
-            this.connection.query('INSERT INTO logs SET ?', {
-                log: log,
-                created_at: this.dateTime()
-            }, function (error, results) {
-                if (!error) {
-                    resolve(results['insertId']);
-                } else {
-                    reject(error);
-                }
-            });
-        });
-    }
-
-    public updateOrder(binanceOrderID, status, executedAmount) {
-        return new Promise((resolve, reject) => {
-            this.connection.query('UPDATE orders SET status = "' + status + '", executed_amount = "' + executedAmount + '" WHERE binance_order_id = "' + binanceOrderID + '"', function (error, results) {
-                if (!error) {
-                    resolve(results.changedRows);
-                } else {
-                    reject(error);
-                }
-            });
-        });
-    }
-
-    public addOrder(botID: number, orderID: number, symbol: string, type: string, price: number, amount: number, executedAmount: number, status: string): Promise<any> {
-        return new Promise((resolve, reject) => {
-            this.connection.query('INSERT INTO orders SET ?', {
-                bot_id: botID,
-                binance_order_id: orderID,
-                symbol: symbol,
-                type: type,
-                price: price,
-                amount: amount,
-                executed_amount: executedAmount,
-                status: status,
-                created_at: this.dateTime()
-            }, function (error, results) {
-                if (!error) {
-                    resolve(results['insertId']);
-                } else {
-                    reject(error);
-                }
-            });
-        });
-    }
-
-    // public getOrders() {
-    //     return new Promise((resolve, reject): any => {
-    //         this.connection.query('SELECT *, order_statuses.name as status_name FROM orders LEFT JOIN order_statuses ON orders.status = order_statuses.id ORDER BY orders.id ASC;', function (error, results) {
-    //             if (!error) {
-    //                 resolve(results);
-    //             } else {
-    //                 reject(error);
-    //             }
-    //         });
-    //     });
-    // }
-
-    public addAccount(name: string, apiKey: string, apiSecret: string): Promise<any> {
+    public addAccount(name: string, exchangeID: number, apiKey: string, apiSecret: string, pass: string): Promise<any> {
         return new Promise((resolve, reject) => {
             this.connection.query('INSERT INTO accounts SET ?', {
                 name: name,
+                exchange_id: exchangeID,
                 apiKey: apiKey,
                 apiSecret: apiSecret,
+                pass: pass,
                 status: 1,
                 created_at: this.dateTime()
             }, function (error, results) {
@@ -127,7 +68,7 @@ export class Database {
 
     public getBots(): Promise<any> {
         return new Promise((resolve, reject) => {
-            this.connection.query('SELECT bots.id, bots.symbol, bots.account_id, bots.type, bots.created_at, bots.updated_at, accounts.name as accountName FROM bots LEFT JOIN accounts on bots.account_id = accounts.id;', function (error, results) {
+            this.connection.query('SELECT * FROM bots WHERE status != -1;', function (error, results) {
                 if (!error) {
                     resolve(results);
                 } else {
@@ -137,12 +78,20 @@ export class Database {
         });
     }
 
-    public createBot(symbol: string, account_id: number, type: number): Promise<any> {
+    public createBot(asset: string, first_account_id: number, second_account_id: number, first_exchange_high_level, first_exchange_low_level, second_exchange_high_level, second_exchange_low_level, chain, first_deposit, second_deposit): Promise<any> {
         return new Promise((resolve, reject) => {
             this.connection.query('INSERT INTO bots SET ?', {
-                symbol: symbol,
-                account_id: account_id,
-                type: type,
+                asset: asset,
+                first_account_id: first_account_id,
+                second_account_id: second_account_id,
+                first_exchange_high_level: first_exchange_high_level,
+                first_exchange_low_level: first_exchange_low_level,
+                second_exchange_high_level: second_exchange_high_level,
+                second_exchange_low_level: second_exchange_low_level,
+                chain: chain,
+                first_deposit: first_deposit,
+                second_deposit: second_deposit,
+                status: 1,
                 created_at: this.dateTime()
             }, function (error, results) {
                 if (!error) {
@@ -154,9 +103,34 @@ export class Database {
         });
     }
 
-    public editBot(botID, type) {
+    public editBot(botID, fH, fL, sH, sL) {
         return new Promise((resolve, reject) => {
-            this.connection.query('UPDATE bots SET type = ' + type + ' WHERE id = ' + botID, function (error, results) {
+            let query = 'UPDATE bots SET first_exchange_high_level = ' + fH + ', first_exchange_low_level = ' + fL + ', second_exchange_high_level = ' + sH + ', second_exchange_low_level = ' + sL + ' WHERE id = ' + botID;
+            this.connection.query(query, function (error, results) {
+                if (!error) {
+                    resolve(results.changedRows);
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    public reRun(botID) {
+        return new Promise((resolve, reject) => {
+            this.connection.query('UPDATE bots SET status = 1 WHERE id = ' + botID, function (error, results) {
+                if (!error) {
+                    resolve(results.changedRows);
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    public stop(botID) {
+        return new Promise((resolve, reject) => {
+            this.connection.query('UPDATE bots SET status = 0 WHERE id = ' + botID, function (error, results) {
                 if (!error) {
                     resolve(results.changedRows);
                 } else {
@@ -169,7 +143,7 @@ export class Database {
     public deleteBot(botID) {
         let dateTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
         return new Promise((resolve, reject) => {
-            this.connection.query('UPDATE bots SET updated_at = "' + dateTime + '" WHERE id = ' + botID, function (error, results) {
+            this.connection.query('UPDATE bots SET status = -1, updated_at = "' + dateTime + '" WHERE id = ' + botID, function (error, results) {
                 if (!error) {
                     resolve(results.changedRows);
                 } else {

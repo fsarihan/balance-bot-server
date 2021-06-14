@@ -12,14 +12,24 @@ export class Accounts {
         });
     }
 
+    public syncGet() {
+        return new Promise((resolve, reject) => {
+            this.database.getAccounts().then((accounts) => {
+                this.accounts = accounts;
+                resolve(accounts);
+            });
+        })
+    }
 
     public add(data) {
         return new Promise((resolve, reject) => {
-            this.database.addAccount(data['name'], data['apiKey'], data['apiSecret']).then((accountID) => {
+            this.database.addAccount(data['name'], data['exchangeID'], data['apiKey'], data['apiSecret'], data['passphrase']).then((accountID) => {
                 resolve(accountID);
                 this.accounts.push({
                     id: accountID,
                     name: data['name'],
+                    exchangeID: data['exchangeID'],
+                    passphrase: data['passphrase'],
                     apiKey: data['apiKey'],
                     apiSecret: data['apiSecret'],
                     status: 1
