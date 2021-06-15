@@ -289,7 +289,7 @@ export class Bot {
                 }
             }
         }
-        setInterval(loop, 5000);
+        setInterval(loop, 15000);
 
     }
 }

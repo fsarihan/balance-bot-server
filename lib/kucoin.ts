@@ -47,12 +47,24 @@ export class KucoinLib {
                 resolve(info);
             } else {
                 let data = await API.rest.User.Withdrawals.getWithdrawalQuotas(token, {chain: chain});
-                let info = {
-                    fee: data.data.withdrawMinFee,
-                    min: data.data.withdrawMinSize,
-                    precision: data.data.precision
+                if (data.code == 900014) {
+                    data = await API.rest.User.Withdrawals.getWithdrawalQuotas(token);
+                    let info = {
+                        fee: data.data.withdrawMinFee,
+                        min: data.data.withdrawMinSize,
+                        precision: data.data.precision
+                    }
+                    resolve(info);
+                } else {
+                    let info = {
+                        fee: data.data.withdrawMinFee,
+                        min: data.data.withdrawMinSize,
+                        precision: data.data.precision
+                    }
+                    resolve(info);
                 }
-                resolve(info);
+
+
             }
         });
     }
@@ -75,7 +87,7 @@ export class KucoinLib {
         return new Promise(async (resolve, reject) => {
             let transferData = {
                 chain: data.network,
-                memo: data.memo,
+                memo: data.addressTag,
             };
             if (data.network == "Default") {
                 delete transferData.chain;
@@ -85,8 +97,10 @@ export class KucoinLib {
             }
 
             let z = await API.rest.User.Withdrawals.applyWithdraw(data.asset, data.address, data.amount, transferData);
-            console.log(z);
-
+            if (z.code == 900014) {
+                delete transferData.chain;
+                let x = await API.rest.User.Withdrawals.applyWithdraw(data.asset, data.address, data.amount, transferData);
+            }
         });
 
 

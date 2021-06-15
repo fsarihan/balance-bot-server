@@ -114,7 +114,7 @@ export class BinanceLib {
                 let transferData = {
                     coin: data.asset,
                     address: data.address,
-                    addressTag: data.memo,
+                    addressTag: data.addressTag,
                     amount: data.amount,
                 };
                 if (typeof transferData.addressTag === "undefined") {
@@ -125,16 +125,18 @@ export class BinanceLib {
                 console.log(z);
             } else {
                 this.networkNameCorrector(data.asset, data.network).then(async (networkName) => {
+
                     let transferData = {
                         coin: data.asset,
                         address: data.address,
                         network: networkName,
-                        addressTag: data.memo,
+                        addressTag: data.addressTag,
                         amount: data.amount,
                     };
                     if (typeof transferData.addressTag === "undefined") {
                         delete transferData.addressTag;
                     }
+
                     let z = await this.binance.withdraw(transferData);
                     console.log(z);
 
