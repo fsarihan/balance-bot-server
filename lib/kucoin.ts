@@ -12,6 +12,7 @@ export class KucoinLib {
             authVersion: 2,
         }
         API.init(config);
+
     }
 
     public getInfo(token) {
@@ -72,7 +73,7 @@ export class KucoinLib {
     public getBalance(token) {
         return new Promise(async (resolve, reject) => {
             let a = await API.rest.User.Account.getAccountsList({
-                type: "main",
+                type: "trade",
                 currency: token
             });
             if (a.data.length == 0) {
@@ -83,26 +84,50 @@ export class KucoinLib {
         });
     }
 
+    public mainToTrade(token, amount) {
+        return new Promise(async (resolve, reject) => {
+            let a = await API.rest.User.Account.getAccountsList({
+                type: "main",
+                currency: token
+            });
+            if (a.data.length !== 0) {
+                if (a.data[0].available >= amount) {
+                    API.rest.User.Account.innerTransfer(Date.now(), token, "main", "trade", amount).then(async (z) => {
+                        console.log(z);
+                        resolve(true);
+                    });
+                } else {
+                    resolve(false);
+                }
+            } else {
+                resolve(false);
+            }
+
+        });
+    }
+
     public transfer(data) {
         return new Promise(async (resolve, reject) => {
-            let transferData = {
-                chain: data.network,
-                memo: data.addressTag,
-            };
-            if (data.network == "Default") {
-                delete transferData.chain;
-            }
-            if (typeof transferData.memo === "undefined") {
-                delete transferData.memo;
-            }
+            API.rest.User.Account.innerTransfer(Date.now(), data.asset, "trade", "main", data.amount).then(async (a) => {
+                console.log(a);
+                let transferData = {
+                    chain: data.network,
+                    memo: data.addressTag,
+                };
+                if (data.network == "Default") {
+                    delete transferData.chain;
+                }
+                if (typeof transferData.memo === "undefined") {
+                    delete transferData.memo;
+                }
 
-            let z = await API.rest.User.Withdrawals.applyWithdraw(data.asset, data.address, data.amount, transferData);
-            if (z.code == 900014) {
-                delete transferData.chain;
-                let x = await API.rest.User.Withdrawals.applyWithdraw(data.asset, data.address, data.amount, transferData);
-            }
+                let z = await API.rest.User.Withdrawals.applyWithdraw(data.asset, data.address, data.amount, transferData);
+                if (z.code == 900014) {
+                    delete transferData.chain;
+                    let x = await API.rest.User.Withdrawals.applyWithdraw(data.asset, data.address, data.amount, transferData);
+                }
+            });
+
         });
-
-
     }
 }

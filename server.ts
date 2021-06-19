@@ -114,5 +114,5 @@ io.on("connection", function (socket: any) {
 
 });
 
-console.log("INFO:", "Started! v0.01", Date.now())
+console.log("INFO:", "Started! v0.02", Date.now())
 

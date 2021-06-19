@@ -2,6 +2,7 @@ import {KucoinLib} from "./kucoin";
 import {BinanceLib} from "./binance";
 import {Database} from "./database";
 import {Accounts} from "./accounts";
+import {parse} from "dotenv";
 
 export class Bot {
     public exchanges;
@@ -10,6 +11,7 @@ export class Bot {
     public accounts;
     public bots: object;
     public botList: object;
+    public kucoinInner;
 
     constructor(notifier) {
         this.exchanges = {
@@ -28,6 +30,12 @@ export class Bot {
         this.accounts = new Accounts();
         this.bots = {};
         this.notifier = notifier;
+        this.kucoinInner = [];
+        // let second = new this.exchanges[2].lib("60be29fc25c18200067aa9e2", "12c2a358-9d8a-4e70-b0d2-77107355cd70", "123456esgg");
+        // this.kucoinInner.push({
+        //     lib: second,
+        //     asset: "USDT",
+        // });
         const starter = async () => {
             await this.initOrUpdateBotList();
             await this.automation();
@@ -229,6 +237,18 @@ export class Bot {
 
     public automation() {
         let loop = async () => {
+            for (let i in this.kucoinInner) {
+                let inner = this.kucoinInner[i];
+                console.log("zFFF");
+                console.log(inner);
+                inner.lib.mainToTrade(inner.asset, inner.amount).then((result) => {
+                    console.log(result);
+                    if (result === true) {
+                        console.log("Yfff")
+                        delete this.kucoinInner[i];
+                    }
+                });
+            }
             for (let botID in this.bots) {
                 let bot = this.bots[botID];
                 if (bot.status == 1) {
@@ -248,7 +268,7 @@ export class Bot {
                         let firstBalance = await first.getBalance(bot.token);
                         let secondBalance = await second.getBalance(bot.token);
                         let transferValue = 0;
-                        if (firstBalance <= bot.first.lowLevel) {
+                        if (parseFloat(firstBalance) <= parseFloat(bot.first.lowLevel)) {
                             transferValue = secondBalance - bot.second.highLevel;
                             //1. Botun bakiyesi, istenilen en düşük seviyeden az, 2->1 ye transfer yapılması gerekiyor.
                             if (transferValue > bot.second.withdrawInfo.min) {
@@ -261,13 +281,22 @@ export class Bot {
                                 };
                                 second.transfer(x).then(() => {
                                     this.notifier(1, "Bot ID:" + bot.botID + " Balance Transfer, 2nd Exchange to 1st Exchange. " + JSON.stringify(x));
+                                    if (bot.first.exchangeID == 2) {
+                                        this.kucoinInner.push({
+                                            lib: first,
+                                            asset: bot.token,
+                                            amount: parseFloat(x.amount) - parseFloat(bot.second.withdrawInfo.fee)
+                                        });
+                                        console.log("aFF");
+                                        console.log(this.kucoinInner);
+                                    }
                                 }).catch((err) => {
                                     this.notifier(2, "Bot ID:" + bot.botID + " Balance Transfer, 2nd Exchange to 1st Exchange. ERROR: " + err);
                                 });
 
                             }
                         }
-                        if (secondBalance <= bot.second.lowLevel) {
+                        if (parseFloat(secondBalance) <= parseFloat(bot.second.lowLevel)) {
                             transferValue = firstBalance - bot.first.highLevel;
                             //2. Botun bakiyesi, istenilen en düşük seviyeden az, 1->2 ye transfer yapılması gerekiyor.
                             if (transferValue > bot.first.withdrawInfo.min) {
@@ -280,6 +309,15 @@ export class Bot {
                                 }
                                 first.transfer(x).then(() => {
                                     this.notifier(1, "Bot ID:" + bot.botID + " Balance Transfer, 1st Exchange to 2nd Exchange. " + JSON.stringify(x));
+                                    if (bot.second.exchangeID == 2) {
+                                        this.kucoinInner.push({
+                                            lib: second,
+                                            asset: bot.token,
+                                            amount: parseFloat(x.amount) - parseFloat(bot.first.withdrawInfo.fee),
+                                        });
+                                        console.log("aFF");
+                                        console.log(this.kucoinInner);
+                                    }
                                 }).catch((err) => {
                                     this.notifier(2, "Bot ID:" + bot.botID + " Balance Transfer, st Exchange to 2nd Exchange. ERROR: " + err);
                                 });
@@ -289,7 +327,7 @@ export class Bot {
                 }
             }
         }
-        setInterval(loop, 15000);
+        setInterval(loop, 15000); //TODO: 15 saniyeye çıkart.
 
     }
 }
