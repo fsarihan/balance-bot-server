@@ -151,7 +151,7 @@ export class Bot {
                     accountID: firstAccountID,
                     account: firstAccount,
                     lowLevel: firstLowLevel,
-                    highLevel: secondHighLevel,
+                    highLevel: firstHighLevel,
                     address: firstAddress,
                     memo: firstMemo,
                     chain: chain,
