@@ -1,8 +1,10 @@
 import {KucoinLib} from "./kucoin";
 import {BinanceLib} from "./binance";
+import {PoloniexLib} from "./poloniex";
+import {KrakenLib} from "./kraken";
 import {Database} from "./database";
 import {Accounts} from "./accounts";
-import {parse} from "dotenv";
+
 
 export class Bot {
     public exchanges;
@@ -24,7 +26,18 @@ export class Bot {
                 name: "Kucoin",
                 lib: KucoinLib,
                 available: true,
+            },
+            3: {
+                name: "Poloniex",
+                lib: PoloniexLib,
+                available: true,
+            },
+            4: {
+                name: "Kraken",
+                lib: KrakenLib,
+                available: true,
             }
+
         }
         this.database = new Database();
         this.accounts = new Accounts();
@@ -217,6 +230,7 @@ export class Bot {
                 }
             }
             result.availableChains = findDuplicates(result.allChains);
+
             if (result.availableChains.length === 0) {
                 for (let chain in firstInfo) {
                     if (typeof firstInfo[chain].isDefault !== "undefined") {
@@ -229,6 +243,9 @@ export class Bot {
                     }
                 }
             }
+            // console.log(result.availableChains);
+            // console.log("_______");
+            // console.log(result.allChains);
             delete result.allChains;
             resolve(result)
 
@@ -239,12 +256,8 @@ export class Bot {
         let loop = async () => {
             for (let i in this.kucoinInner) {
                 let inner = this.kucoinInner[i];
-                console.log("zFFF");
-                console.log(inner);
                 inner.lib.mainToTrade(inner.asset, inner.amount).then((result) => {
-                    console.log(result);
                     if (result === true) {
-                        console.log("Yfff")
                         delete this.kucoinInner[i];
                     }
                 });
@@ -278,6 +291,7 @@ export class Bot {
                                     network: bot.chain,
                                     addressTag: bot.first.memo,
                                     amount: transferValue.toFixed(bot.second.withdrawInfo.precision),
+                                    accountID: bot.first.accountID,
                                 };
                                 second.transfer(x).then(() => {
                                     this.notifier(1, "Bot ID:" + bot.botID + " Balance Transfer, 2nd Exchange to 1st Exchange. " + JSON.stringify(x));
@@ -287,8 +301,6 @@ export class Bot {
                                             asset: bot.token,
                                             amount: parseFloat(x.amount) - parseFloat(bot.second.withdrawInfo.fee)
                                         });
-                                        console.log("aFF");
-                                        console.log(this.kucoinInner);
                                     }
                                 }).catch((err) => {
                                     this.notifier(2, "Bot ID:" + bot.botID + " Balance Transfer, 2nd Exchange to 1st Exchange. ERROR: " + err);
@@ -306,6 +318,7 @@ export class Bot {
                                     network: bot.chain,
                                     addressTag: bot.second.memo,
                                     amount: transferValue.toFixed(bot.first.withdrawInfo.precision),
+                                    accountID: bot.second.accountID,
                                 }
                                 first.transfer(x).then(() => {
                                     this.notifier(1, "Bot ID:" + bot.botID + " Balance Transfer, 1st Exchange to 2nd Exchange. " + JSON.stringify(x));
@@ -315,8 +328,6 @@ export class Bot {
                                             asset: bot.token,
                                             amount: parseFloat(x.amount) - parseFloat(bot.first.withdrawInfo.fee),
                                         });
-                                        console.log("aFF");
-                                        console.log(this.kucoinInner);
                                     }
                                 }).catch((err) => {
                                     this.notifier(2, "Bot ID:" + bot.botID + " Balance Transfer, st Exchange to 2nd Exchange. ERROR: " + err);
@@ -327,7 +338,7 @@ export class Bot {
                 }
             }
         }
-        setInterval(loop, 15000); //TODO: 15 saniyeye çıkart.
+        setInterval(loop, 10000); //TODO: 15 saniyeye çıkart.
 
     }
 }

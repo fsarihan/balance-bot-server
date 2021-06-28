@@ -93,6 +93,7 @@ io.on("connection", function (socket: any) {
         bots.create(data);
     });
     socket.on('getInfo', (data) => {
+
         for (let i in accountList) {
             let account = accountList[i];
             if (account['id'] == data['firstAccountID']) {
@@ -103,6 +104,28 @@ io.on("connection", function (socket: any) {
             }
         }
         bots.getInfo(data).then((result) => {
+            if (data.firstAccount.exchangeID == 4) {
+                for (let i in result['availableChains']) {
+                    let chainName = result['availableChains'][i];
+                    result['second'][chainName]['info'] = {
+                        note: "You need to add a withdrawal address to withdraw from Kraken.",
+                        name: (data['secondAccountID'] + data.asset + chainName + result['second'][chainName].depositAddress.substring(0, 8)).toUpperCase(),
+                        address: result['second'][chainName].depositAddress,
+                        memo: result['second'][chainName].depositMemo
+                    }
+                }
+            }
+            if (data.secondAccount.exchangeID == 4) {
+                for (let i in result['availableChains']) {
+                    let chainName = result['availableChains'][i];
+                    result['first'][chainName]['info'] = {
+                        name: (data['firstAccountID'] + data.asset + chainName + result['first'][chainName].depositAddress.substring(0, 8)).toUpperCase(),
+                        address: result['first'][chainName].depositAddress,
+                        memo: result['first'][chainName].depositMemo
+                    }
+                }
+            }
+            console.log(result);
             io.emit('getInfo', result);
         });
 
@@ -114,5 +137,5 @@ io.on("connection", function (socket: any) {
 
 });
 
-console.log("INFO:", "Started! v0.021", Date.now())
+console.log("INFO:", "Started! v0.03", Date.now())
 

@@ -93,7 +93,6 @@ export class KucoinLib {
             if (a.data.length !== 0) {
                 if (a.data[0].available >= amount) {
                     API.rest.User.Account.innerTransfer(Date.now(), token, "main", "trade", amount).then(async (z) => {
-                        console.log(z);
                         resolve(true);
                     });
                 } else {

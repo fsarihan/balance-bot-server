@@ -14,16 +14,17 @@
 		"dotenv": "^9.0.2",
 		"events": "^3.3.0",
 		"express": "^4.17.1",
+		"kraken-api": "^1.0.1",
 		"kucoin-node-sdk": "file:./kucoin-node-sdk",
 		"limiter": "^2.0.1",
 		"mysql": "^2.18.1",
 		"node-binance-api": "^0.12.5",
+		"poloniex-api-node": "^2.0.2",
 		"reflect-metadata": "^0.1.13",
 		"socket.io": "^4.1.2",
 		"throttle-debounce": "^3.0.1",
 		"throttled-queue": "^1.0.7"
 	},
-	"devDependencies": {},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"start": "node server.js"
