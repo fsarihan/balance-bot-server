@@ -243,9 +243,6 @@ export class Bot {
                     }
                 }
             }
-            // console.log(result.availableChains);
-            // console.log("_______");
-            // console.log(result.allChains);
             delete result.allChains;
             resolve(result)
 

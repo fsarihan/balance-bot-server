@@ -147,7 +147,6 @@ export class PoloniexLib {
             if (data.network == "ERC20" && data.asset == "USDT") {
                 data.asset = "USDTETH";
             }
-            console.log(data);
             this.client.withdraw(data.asset, data.amount, data.address, data.addressTag, (e, r) => {
                 console.log(r);
                 console.log(e);

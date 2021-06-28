@@ -125,7 +125,6 @@ io.on("connection", function (socket: any) {
                     }
                 }
             }
-            console.log(result);
             io.emit('getInfo', result);
         });
 

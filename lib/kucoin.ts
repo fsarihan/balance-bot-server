@@ -108,7 +108,6 @@ export class KucoinLib {
     public transfer(data) {
         return new Promise(async (resolve, reject) => {
             API.rest.User.Account.innerTransfer(Date.now(), data.asset, "trade", "main", data.amount).then(async (a) => {
-                console.log(a);
                 let transferData = {
                     chain: data.network,
                     memo: data.addressTag,
