@@ -140,7 +140,7 @@ export class PoloniexLib {
 
     public transfer(data) {
         return new Promise(async (resolve, reject) => {
-
+            data.asset = this.tokenNameCorrector(data.asset);
             if (data.network == "TRC20") {
                 data.asset = data.asset + "TRON";
             }
