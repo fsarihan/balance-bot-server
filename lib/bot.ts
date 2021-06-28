@@ -335,7 +335,7 @@ export class Bot {
                 }
             }
         }
-        setInterval(loop, 10000); //TODO: 15 saniyeye çıkart.
+        setInterval(loop, 15000); //TODO: 15 saniyeye çıkart.
 
     }
 }
