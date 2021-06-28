@@ -120,7 +120,7 @@ export class KrakenLib {
     public getBalance(token) {
         return new Promise(async (resolve, reject) => {
             let detail = await this.getAssetDetail(token);
-            token = detail[Object.keys(detail)[0]].altname;
+            token = Object.keys(detail)[0];
             this.client.privateMethod('Balance', {
                 asset: token
             }, async (err, balances) => {
