@@ -126,6 +126,7 @@ export class KrakenLib {
             }, async (err, balances) => {
                 if (typeof balances["result"] !== "undefined") {
                     if (typeof balances["result"][token] !== "undefined") {
+                        console.log("Kraken balance:", balances["result"][token]);
                         resolve(balances["result"][token]);
                     } else {
                         resolve(0);

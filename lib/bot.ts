@@ -5,6 +5,7 @@ import {KrakenLib} from "./kraken";
 import {Database} from "./database";
 import {Accounts} from "./accounts";
 
+const crypto = require('crypto');
 
 export class Bot {
     public exchanges;
@@ -14,6 +15,7 @@ export class Bot {
     public bots: object;
     public botList: object;
     public kucoinInner;
+    public transfers: object = {};
 
     constructor(notifier) {
         this.exchanges = {
@@ -290,19 +292,27 @@ export class Bot {
                                     amount: transferValue.toFixed(bot.second.withdrawInfo.precision),
                                     accountID: bot.first.accountID,
                                 };
-                                second.transfer(x).then(() => {
-                                    this.notifier(1, "Bot ID:" + bot.botID + " Balance Transfer, 2nd Exchange to 1st Exchange. " + JSON.stringify(x));
-                                    if (bot.first.exchangeID == 2) {
-                                        this.kucoinInner.push({
-                                            lib: first,
-                                            asset: bot.token,
-                                            amount: parseFloat(x.amount) - parseFloat(bot.second.withdrawInfo.fee)
-                                        });
-                                    }
-                                }).catch((err) => {
-                                    this.notifier(2, "Bot ID:" + bot.botID + " Balance Transfer, 2nd Exchange to 1st Exchange. ERROR: " + err);
-                                });
-
+                                let transferID = crypto.createHash('md5').update(JSON.stringify({
+                                    1: x.asset,
+                                    2: x.address,
+                                    3: x.accountID,
+                                    4: x.addressTag
+                                })).digest('hex');
+                                if (typeof this.transfers[transferID] === "undefined" || this.transfers[transferID] + (1000 * 60 * 3) <= Date.now()) {
+                                    this.transfers[transferID] = Date.now();
+                                    second.transfer(x).then(() => {
+                                        this.notifier(1, "Bot ID:" + bot.botID + " Balance Transfer, 2nd Exchange to 1st Exchange. " + JSON.stringify(x));
+                                        if (bot.first.exchangeID == 2) {
+                                            this.kucoinInner.push({
+                                                lib: first,
+                                                asset: bot.token,
+                                                amount: parseFloat(x.amount) - parseFloat(bot.second.withdrawInfo.fee)
+                                            });
+                                        }
+                                    }).catch((err) => {
+                                        this.notifier(2, "Bot ID:" + bot.botID + " Balance Transfer, 2nd Exchange to 1st Exchange. ERROR: " + err);
+                                    });
+                                }
                             }
                         }
                         if (parseFloat(secondBalance) <= parseFloat(bot.second.lowLevel)) {
@@ -317,25 +327,34 @@ export class Bot {
                                     amount: transferValue.toFixed(bot.first.withdrawInfo.precision),
                                     accountID: bot.second.accountID,
                                 }
-                                first.transfer(x).then(() => {
-                                    this.notifier(1, "Bot ID:" + bot.botID + " Balance Transfer, 1st Exchange to 2nd Exchange. " + JSON.stringify(x));
-                                    if (bot.second.exchangeID == 2) {
-                                        this.kucoinInner.push({
-                                            lib: second,
-                                            asset: bot.token,
-                                            amount: parseFloat(x.amount) - parseFloat(bot.first.withdrawInfo.fee),
-                                        });
-                                    }
-                                }).catch((err) => {
-                                    this.notifier(2, "Bot ID:" + bot.botID + " Balance Transfer, st Exchange to 2nd Exchange. ERROR: " + err);
-                                });
+                                let transferID = crypto.createHash('md5').update(JSON.stringify({
+                                    1: x.asset,
+                                    2: x.address,
+                                    3: x.accountID,
+                                    4: x.addressTag
+                                })).digest('hex');
+                                if (typeof this.transfers[transferID] === "undefined" || this.transfers[transferID] + (1000 * 60 * 3) <= Date.now()) {
+                                    this.transfers[transferID] = Date.now();
+                                    first.transfer(x).then(() => {
+                                        this.notifier(1, "Bot ID:" + bot.botID + " Balance Transfer, 1st Exchange to 2nd Exchange. " + JSON.stringify(x));
+                                        if (bot.second.exchangeID == 2) {
+                                            this.kucoinInner.push({
+                                                lib: second,
+                                                asset: bot.token,
+                                                amount: parseFloat(x.amount) - parseFloat(bot.first.withdrawInfo.fee),
+                                            });
+                                        }
+                                    }).catch((err) => {
+                                        this.notifier(2, "Bot ID:" + bot.botID + " Balance Transfer, st Exchange to 2nd Exchange. ERROR: " + err);
+                                    });
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        setInterval(loop, 15000); //TODO: 15 saniyeye çıkart.
+        setInterval(loop, 45 * 1000);
 
     }
 }
