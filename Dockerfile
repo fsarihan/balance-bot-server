@@ -1,4 +1,4 @@
-FROM node:14.15.4-alpine
+FROM node:14.17.0-alpine
 WORKDIR /var/nodejs
 COPY package*.json ./
 COPY ./dist .
