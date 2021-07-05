@@ -2,6 +2,7 @@ import {KucoinLib} from "./kucoin";
 import {BinanceLib} from "./binance";
 import {PoloniexLib} from "./poloniex";
 import {KrakenLib} from "./kraken";
+import {CoinbasePRO} from "./coinbasepro";
 import {Database} from "./database";
 import {Accounts} from "./accounts";
 
@@ -38,6 +39,11 @@ export class Bot {
                 name: "Kraken",
                 lib: KrakenLib,
                 available: true,
+            },
+            5: {
+                name: "Coinbase PRO",
+                lib: CoinbasePRO,
+                available: true,
             }
 
         }
@@ -46,11 +52,6 @@ export class Bot {
         this.bots = {};
         this.notifier = notifier;
         this.kucoinInner = [];
-        // let second = new this.exchanges[2].lib("60be29fc25c18200067aa9e2", "12c2a358-9d8a-4e70-b0d2-77107355cd70", "123456esgg");
-        // this.kucoinInner.push({
-        //     lib: second,
-        //     asset: "USDT",
-        // });
         const starter = async () => {
             await this.initOrUpdateBotList();
             await this.automation();
@@ -204,7 +205,6 @@ export class Bot {
             }
             let first = new this.exchanges[firstAccount.exchangeID].lib(firstAccount.apiKey, firstAccount.apiSecret, firstAccount.pass);
             let second = new this.exchanges[secondAccount.exchangeID].lib(secondAccount.apiKey, secondAccount.apiSecret, secondAccount.pass);
-
             let firstInfo = await first.getInfo(token);
             let secondInfo = await second.getInfo(token);
             let result = {
@@ -232,7 +232,6 @@ export class Bot {
                 }
             }
             result.availableChains = findDuplicates(result.allChains);
-
             if (result.availableChains.length === 0) {
                 for (let chain in firstInfo) {
                     if (typeof firstInfo[chain].isDefault !== "undefined") {
@@ -247,7 +246,6 @@ export class Bot {
             }
             delete result.allChains;
             resolve(result)
-
         });
     }
 
